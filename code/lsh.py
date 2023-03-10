@@ -197,12 +197,42 @@ def minHash(docs_signature_sets,pi):
 
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
-def lsh(m_matrix):
+def lsh(m_matrix, r, no_of_buckets):
     candidates = []  # list of candidate sets of documents for checking similarity
 
     # implement your code here
-
+    b = len(m_matrix)//r
+    start = 0
+    end = start + r
+    for band in range(b):
+        buckets = [[] for _ in range(no_of_buckets)]
+        bucket_candidates = [[] for _ in range(no_of_buckets)]
+        for row in range(len(m_matrix[0])):
+            temp = []
+            try:
+                for i in range(start, end):
+                    temp.append(m_matrix[i][row])
+                #print(temp)
+                #print(buckets)
+                for index, bucket in enumerate(buckets):
+                    if temp not in buckets:
+                        buckets[row] = temp
+                        bucket_candidates[row].append(row)
+                        break
+                    else:
+                        if temp == bucket:
+                            bucket_candidates[index].append(row)
+            except:
+                pass
+        #print("v",bucket_candidates)
+        for candidate in bucket_candidates:
+            if len(candidate) > 1:
+                candidates.append(candidate)
+        start = end
+        end = start + r
+    print(candidates)
     return candidates
+
 
 
 # METHOD FOR TASK 5
@@ -279,14 +309,14 @@ if __name__ == '__main__':
     # Permutations
     print("Starting to simulate the MinHash Signature Matrix...")
     t8 = time.time()
-    min_hash_signatures = minHash(signature_sets,3)
+    min_hash_signatures = minHash(signature_sets,4)
     t9 = time.time()
     print("Simulation of MinHash Signature Matrix took", t9 - t8, "sec\n")
 
     # LSH
     print("Starting the Locality-Sensitive Hashing...")
     t10 = time.time()
-    candidate_docs = lsh(min_hash_signatures)
+    candidate_docs = lsh(min_hash_signatures, 2, 10)
     t11 = time.time()
     print("LSH took", t11 - t10, "sec\n")
 
