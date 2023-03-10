@@ -154,30 +154,44 @@ def signature_set(k_shingles):
 # METHOD FOR TASK 3
 # Creates the minHash signatures after simulation of permutations
 def minHash(docs_signature_sets,pi):
+    print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
     for i in range(pi):
         tilfeldig=[]
-        for j in range(docs_signature_sets.shape[0]):           #shape[1]??
+        for j in range(len(docs_signature_sets)):           #shape[1]??
             tilfeldig.append(j)
-        permutation_matrix.append(random.shuffle(tilfeldig))
-    
-    pi_iter=0
-    while True:
-        signature_row=np.empty(docs_signature_sets_numofdocs)
-        a=permutation_matrix.index(pi_iter)
-        for j in range(len(docs_signature_sets_num_of_docs)):#number of docs
-            if shingles_line[j]==1:
-                if signature_row[j] ==0:
-                    signature_row[j]=pi_iter
-
-        pi_iter+=1
-        break
-
-    
+        random.shuffle(tilfeldig)
+        permutation_matrix.append(tilfeldig)
+    print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
+    
+    for i in range(pi):
+        pi_iter=0
+        signature_row=np.empty(len(docs_signature_sets[0]))
+        signature_row=signature_row.tolist()
+        #for iter in range(len(docs_signature_sets)):
+        while True:
+            #print("sigrow of 0's",signature_row)#ok
+            a=permutation_matrix[i].index(pi_iter)          #a=rad 7,5,1,...
+            for j in range(len(docs_signature_sets[0])):#number of docs. Iterating through a doc.
+                if docs_signature_sets[a][j]==1:
+                    print("sigrow",signature_row)
+                    if signature_row[j] ==0:
+                        signature_row[j]=pi_iter
+                        print("sigrow",signature_row)
 
+            pi_iter+=1
+            print(signature_row)
+            #print("docs_signature_sets",docs_signature_sets)
+            #print("len",len(docs_signature_sets))
+            if ((not(0 in signature_row)) or (pi_iter>=len(docs_signature_sets))):
+                print("pi_iter",pi_iter)
+                min_hash_signatures.append(signature_row)
+                break
+    
 
+    print("min_hash_signatures:",min_hash_signatures)
     return min_hash_signatures
 
 
@@ -243,7 +257,7 @@ if __name__ == '__main__':
     if parameters_dictionary['naive']:
         print("Starting to calculate the similarities of documents...")
         t2 = time.time()
-        naive_similarity_matrix = naive()
+        #naive_similarity_matrix = naive()                          #REMOVE COMMENT OUT!
         t3 = time.time()
         print("Calculating the similarities of", len(naive_similarity_matrix),
               "combinations of documents took", t3 - t2, "sec\n")
@@ -265,7 +279,7 @@ if __name__ == '__main__':
     # Permutations
     print("Starting to simulate the MinHash Signature Matrix...")
     t8 = time.time()
-    min_hash_signatures = minHash(signature_sets)
+    min_hash_signatures = minHash(signature_sets,3)
     t9 = time.time()
     print("Simulation of MinHash Signature Matrix took", t9 - t8, "sec\n")
 
