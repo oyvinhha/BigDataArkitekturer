@@ -5,6 +5,8 @@ import sys  # for system errors and printouts
 from pathlib import Path  # for paths of files
 import os  # for reading the input data
 import time  # for timing
+import random
+from tqdm import tqdm
 
 # Global parameters
 parameter_file = 'default_parameters.ini'  # the main parameters file
@@ -87,7 +89,7 @@ def naive():
 
 # METHOD FOR TASK 1
 # Creates the k-Shingles of each document and returns a list of them
-def k_shingles(document_file, k):
+def k_shingles_one_doc(document_file, k):
     with open(document_file,'r') as file:
         words=[]
         docs_k_shingles=[]# holds the k-shingles of each document
@@ -110,7 +112,18 @@ def k_shingles(document_file, k):
 
     return docs_k_shingles
 
-
+def k_shingles(directory, k):
+    total=[]
+    for filename in tqdm(os.listdir(directory)):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            print(f)
+        total.append(k_shingles_one_doc(f,k))
+    print("total",total)
+    return total
+        
+        
 # METHOD FOR TASK 2
 # Creates a signatures set of the documents from the k-shingles list
 def signature_set(k_shingles):
@@ -123,10 +136,16 @@ def signature_set(k_shingles):
 
 # METHOD FOR TASK 3
 # Creates the minHash signatures after simulation of permutations
-def minHash(docs_signature_sets):
+def minHash(docs_signature_sets,pi):
+    permutation_matrix=[]
+    for i in range(pi):
+        tilfeldig=[]
+        for j in range(docs_signature_sets.shape[0]):           #shape[1]??
+            tilfeldig.append(j)
+        permutation_matrix.append(random.shuffle(tilfeldig))
+                
     min_hash_signatures = []
 
-    # implement your code here
 
     return min_hash_signatures
 
@@ -175,7 +194,7 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
 # The main method where all code starts
 if __name__ == '__main__':
     #k_shingles("data/bbc/001.txt",2)
-    k_shingles("data/test/self_made_test.txt",2)
+    #k_shingles("data/test/self_made_test.txt",2)
     # Reading the parameters
     read_parameters()
 
@@ -201,7 +220,7 @@ if __name__ == '__main__':
     # k-Shingles
     print("Starting to create all k-shingles of the documents...")
     t4 = time.time()
-    all_docs_k_shingles = k_shingles()
+    all_docs_k_shingles = k_shingles('data/test',2)
     t5 = time.time()
     print("Representing documents with k-shingles took", t5 - t4, "sec\n")
 
