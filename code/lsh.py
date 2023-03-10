@@ -7,6 +7,7 @@ import os  # for reading the input data
 import time  # for timing
 import random
 from tqdm import tqdm
+import numpy as np
 
 # Global parameters
 parameter_file = 'default_parameters.ini'  # the main parameters file
@@ -143,7 +144,21 @@ def minHash(docs_signature_sets,pi):
         for j in range(docs_signature_sets.shape[0]):           #shape[1]??
             tilfeldig.append(j)
         permutation_matrix.append(random.shuffle(tilfeldig))
-                
+    
+    pi_iter=0
+    while True:
+        signature_row=np.empty(docs_signature_sets_numofdocs)
+        a=permutation_matrix.index(pi_iter)
+        for j in range(len(docs_signature_sets_num_of_docs)):#number of docs
+            if shingles_line[j]==1:
+                if signature_row[j] ==0:
+                    signature_row[j]=pi_iter
+
+        pi_iter+=1
+        break
+
+    
+
     min_hash_signatures = []
 
 
