@@ -93,15 +93,9 @@ def k_shingles(document_file, k):
         docs_k_shingles=[]# holds the k-shingles of each document
 
         for line in file:
-            print(line)
-    
             for word in line.split():
                 words.append(word)
-
-                #for i in range(k):
-
     
-                # displaying the words          
         for i in range(len(words)):
             try:
                 shingle=[]
@@ -111,14 +105,8 @@ def k_shingles(document_file, k):
                     docs_k_shingles.append(shingle)
             except:
                 uesless_variable=1
-                print("nearing end")
-    #document = open("document_file", "r")
 
     print(docs_k_shingles)
-
-    # implement your code here
-
-
 
     return docs_k_shingles
 
