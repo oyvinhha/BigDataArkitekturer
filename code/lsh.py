@@ -7,6 +7,7 @@ import os  # for reading the input data
 import time  # for timing
 import random
 from tqdm import tqdm
+import numpy as np
 
 # Global parameters
 parameter_file = 'default_parameters.ini'  # the main parameters file
@@ -130,7 +131,23 @@ def signature_set(k_shingles):
     docs_sig_sets = []
 
     # implement your code here
+    print(list(document_list.keys())[-1])
+    #signature = []
+    shingles = []
+    for document in k_shingles:
+        for shingle in document:
+            if shingle not in shingles:
+                shingles.append(shingle)
 
+    print(shingles)
+    for i, v in enumerate(shingles):
+        temp_list = np.zeros(len(k_shingles))
+        for ind, document in enumerate(k_shingles):
+            if v in document:
+                temp_list[ind] = 1
+        docs_sig_sets.append(list(temp_list))
+        print(temp_list)
+    print(docs_sig_sets)
     return docs_sig_sets
 
 
