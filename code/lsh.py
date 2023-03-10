@@ -87,10 +87,38 @@ def naive():
 
 # METHOD FOR TASK 1
 # Creates the k-Shingles of each document and returns a list of them
-def k_shingles():
-    docs_k_shingles = []  # holds the k-shingles of each document
+def k_shingles(document_file, k):
+    with open(document_file,'r') as file:
+        words=[]
+        docs_k_shingles=[]# holds the k-shingles of each document
+
+        for line in file:
+            print(line)
+    
+            for word in line.split():
+                words.append(word)
+
+                #for i in range(k):
+
+    
+                # displaying the words          
+        for i in range(len(words)):
+            try:
+                shingle=[]
+                for j in range(k):
+                    shingle.append(words[i+j])
+                if not shingle in docs_k_shingles:
+                    docs_k_shingles.append(shingle)
+            except:
+                uesless_variable=1
+                print("nearing end")
+    #document = open("document_file", "r")
+
+    print(docs_k_shingles)
 
     # implement your code here
+
+
 
     return docs_k_shingles
 
@@ -158,6 +186,8 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
 # DO NOT CHANGE THIS METHOD
 # The main method where all code starts
 if __name__ == '__main__':
+    #k_shingles("data/bbc/001.txt",2)
+    k_shingles("data/test/self_made_test.txt",2)
     # Reading the parameters
     read_parameters()
 
