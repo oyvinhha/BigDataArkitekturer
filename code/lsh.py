@@ -301,8 +301,8 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
     false_negatives = 0
     false_positives = 0
     for id, similarity in enumerate(lsh_similarity_matrix):
-        naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(naive_similarity_matrix))]
-        print(naive_sim)
+        naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
+        #print(naive_sim)
         if similarity > t and naive_sim <= t:
             false_positives += 1
         elif similarity <= t and naive_sim > t:
@@ -320,6 +320,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
 
     # Reading the data
     print("Data reading...")
@@ -330,8 +332,7 @@ if __name__ == '__main__':
     t1 = time.time()
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
 
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']=''
+    
 
     # Naive
     naive_similarity_matrix = []
