@@ -394,7 +394,7 @@ if __name__ == '__main__':
     if parameters_dictionary['naive']:
         print("Starting to calculate the false negatives and positives...")
         t16 = time.time()
-        false_negatives, false_positives = count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, parameters_dictionary["t"])
+        false_negatives, false_positives = count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix)
         t17 = time.time()
         print("False negatives = ", false_negatives, "\nFalse positives = ", false_positives, "\n\n")
 
