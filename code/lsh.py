@@ -121,8 +121,8 @@ def k_shingles():
     for filename in tqdm(os.listdir(directory)):
         f = os.path.join(directory, filename)
         # checking if it is a file
-        if os.path.isfile(f):
-            print(f)
+        #if os.path.isfile(f):
+        #    print(f)
         total.append(k_shingles_one_doc(f))
     #print("total",total)
     return total
@@ -136,11 +136,16 @@ def signature_set(k_shingles):
     # implement your code here
     #print(list(document_list.keys())[-1])
     #signature = []
-    shingles = []
-    for document in k_shingles:
+    #shingles = []
+
+    k_shingles=np.array(k_shingles)
+    k_shingles.flatten()
+    shingles = np.unique(k_shingles)
+
+    """    for document in tqdm(k_shingles):
         for shingle in document:
             if shingle not in shingles:
-                shingles.append(shingle)
+                shingles.append(shingle)"""
 
     print("Total amount of shingles: ",len(shingles))
     for i, v in tqdm(enumerate(shingles)):
@@ -149,7 +154,7 @@ def signature_set(k_shingles):
             if v in document:
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
-        print(temp_list)
+        #print(temp_list)
     #print("docs_sig_sets",docs_sig_sets)
     return docs_sig_sets
 
@@ -324,8 +329,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']="true"
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
 
     # Reading the data
     print("Data reading...")
@@ -388,9 +393,9 @@ if __name__ == '__main__':
     pairs = return_results(lsh_similarity_matrix)
     t15 = time.time()
     print("The pairs of documents are:\n")
-    for p in pairs:
-        print(p)
-    print("\n")
+    #for p in pairs:
+    #    print(p)
+    #print("\n")
 
     # Count false negatives and positives
     if parameters_dictionary['naive']:
@@ -405,5 +410,5 @@ if __name__ == '__main__':
 
     print("LSH process took in total", t13 - t4, "sec")
     #print(parameters_dictionary)
-    print("candidate_docs:",candidate_docs)
+    print("candidate_docs:",len(candidate_docs))
 
