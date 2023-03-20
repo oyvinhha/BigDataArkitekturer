@@ -296,7 +296,7 @@ def return_results(lsh_similarity_matrix):
 
 # METHOD FOR TASK 6
 def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
-    print(lsh_similarity_matrix)
+    t = parameters_dictionary["t"]
     #print(naive_similarity_matrix[:10])
     false_negatives = 0
     false_positives = 0
@@ -320,8 +320,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']="true"
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
 
     # Reading the data
     print("Data reading...")
