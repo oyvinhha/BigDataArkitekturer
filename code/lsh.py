@@ -93,7 +93,9 @@ def naive():
 
 # METHOD FOR TASK 1
 # Creates the k-Shingles of each document and returns a list of them
-def k_shingles_one_doc(document_file, k):
+def k_shingles_one_doc(document_file):
+    k=parameters_dictionary["k"]
+
     with open(document_file,'r') as file:
         words=[]
         docs_k_shingles=[]# holds the k-shingles of each document
@@ -110,21 +112,17 @@ def k_shingles_one_doc(document_file, k):
                 if not shingle in docs_k_shingles:
                     docs_k_shingles.append(shingle)
             except:
-                uesless_variable=1
-
-    print(docs_k_shingles)
-
+                pass
     return docs_k_shingles
 
-def k_shingles(directory, k):
+def k_shingles(directory):#skal ikke ta inn noe...
     total=[]
     for filename in tqdm(os.listdir(directory)):
         f = os.path.join(directory, filename)
         # checking if it is a file
         if os.path.isfile(f):
             print(f)
-        total.append(k_shingles_one_doc(f,k))
-    print("total",total)
+        total.append(k_shingles_one_doc(f))
     return total
         
         
@@ -200,7 +198,9 @@ def minHash(docs_signature_sets,pi):
 
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
-def lsh(m_matrix, r, no_of_buckets):
+def lsh(m_matrix, r):
+    no_of_buckets=parameters_dictionary["k"]
+    r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
 
     # implement your code here
@@ -291,6 +291,7 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
 # DO NOT CHANGE THIS METHOD
 # The main method where all code starts
 if __name__ == '__main__':
+    
     #k_shingles("data/bbc/001.txt",2)
     #k_shingles("data/test/self_made_test.txt",2)
     # Reading the parameters
@@ -318,7 +319,7 @@ if __name__ == '__main__':
     # k-Shingles
     print("Starting to create all k-shingles of the documents...")
     t4 = time.time()
-    all_docs_k_shingles = k_shingles('data/test',2)
+    all_docs_k_shingles = k_shingles('data/test')
     t5 = time.time()
     print("Representing documents with k-shingles took", t5 - t4, "sec\n")
 
@@ -339,7 +340,7 @@ if __name__ == '__main__':
     # LSH
     print("Starting the Locality-Sensitive Hashing...")
     t10 = time.time()
-    candidate_docs = lsh(min_hash_signatures, 2, 10)
+    candidate_docs = lsh(min_hash_signatures)
     t11 = time.time()
     print("LSH took", t11 - t10, "sec\n")
     print("LSH candidate docs: ",candidate_docs)
