@@ -93,7 +93,9 @@ def naive():
 
 # METHOD FOR TASK 1
 # Creates the k-Shingles of each document and returns a list of them
-def k_shingles_one_doc(document_file, k):
+def k_shingles_one_doc(document_file):
+    k=parameters_dictionary["k"]
+
     with open(document_file,'r') as file:
         words=[]
         docs_k_shingles=[]# holds the k-shingles of each document
@@ -110,21 +112,18 @@ def k_shingles_one_doc(document_file, k):
                 if not shingle in docs_k_shingles:
                     docs_k_shingles.append(shingle)
             except:
-                uesless_variable=1
-
-    print(docs_k_shingles)
-
+                pass
     return docs_k_shingles
 
-def k_shingles(directory, k):
+def k_shingles():
+    directory="data/"+parameters_dictionary["data"]
     total=[]
     for filename in tqdm(os.listdir(directory)):
         f = os.path.join(directory, filename)
         # checking if it is a file
         if os.path.isfile(f):
             print(f)
-        total.append(k_shingles_one_doc(f,k))
-    print("total",total)
+        total.append(k_shingles_one_doc(f))
     return total
         
         
@@ -156,7 +155,8 @@ def signature_set(k_shingles):
 
 # METHOD FOR TASK 3
 # Creates the minHash signatures after simulation of permutations
-def minHash(docs_signature_sets,pi):
+def minHash(docs_signature_sets):
+    pi=parameters_dictionary['permutations']
     print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
     for i in range(pi):
@@ -200,7 +200,9 @@ def minHash(docs_signature_sets,pi):
 
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
-def lsh(m_matrix, r, no_of_buckets):
+def lsh(m_matrix):
+    no_of_buckets=parameters_dictionary["k"]
+    r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
 
     # implement your code here
@@ -278,7 +280,8 @@ permutations"""
 
 # METHOD FOR TASK 6
 # Returns the document pairs of over t% similarity
-def return_results(lsh_similarity_matrix, t):
+def return_results(lsh_similarity_matrix):
+    t=parameters_dictionary['t']
     document_pairs = []
     count = 0
     for id, similarity in enumerate(lsh_similarity_matrix):
@@ -314,8 +317,7 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
 # DO NOT CHANGE THIS METHOD
 # The main method where all code starts
 if __name__ == '__main__':
-    #k_shingles("data/bbc/001.txt",2)
-    #k_shingles("data/test/self_made_test.txt",2)
+    
     # Reading the parameters
     read_parameters()
 
@@ -328,12 +330,15 @@ if __name__ == '__main__':
     t1 = time.time()
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
 
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']=''
+
     # Naive
     naive_similarity_matrix = []
     if parameters_dictionary['naive']:
         print("Starting to calculate the similarities of documents...")
         t2 = time.time()
-        #naive_similarity_matrix = naive()                          #REMOVE COMMENT OUT!
+        naive_similarity_matrix = naive()
         t3 = time.time()
         print("Calculating the similarities of", len(naive_similarity_matrix),
               "combinations of documents took", t3 - t2, "sec\n")
@@ -341,7 +346,7 @@ if __name__ == '__main__':
     # k-Shingles
     print("Starting to create all k-shingles of the documents...")
     t4 = time.time()
-    all_docs_k_shingles = k_shingles('data/test',2)
+    all_docs_k_shingles = k_shingles()#k_shingles('data/test')
     t5 = time.time()
     print("Representing documents with k-shingles took", t5 - t4, "sec\n")
 
@@ -355,14 +360,14 @@ if __name__ == '__main__':
     # Permutations
     print("Starting to simulate the MinHash Signature Matrix...")
     t8 = time.time()
-    min_hash_signatures = minHash(signature_sets,4)
+    min_hash_signatures = minHash(signature_sets)
     t9 = time.time()
     print("Simulation of MinHash Signature Matrix took", t9 - t8, "sec\n")
 
     # LSH
     print("Starting the Locality-Sensitive Hashing...")
     t10 = time.time()
-    candidate_docs = lsh(min_hash_signatures, 2, 10)
+    candidate_docs = lsh(min_hash_signatures)
     t11 = time.time()
     print("LSH took", t11 - t10, "sec\n")
     print("LSH candidate docs: ",candidate_docs)
@@ -377,7 +382,7 @@ if __name__ == '__main__':
     # Return the over t similar pairs
     print("Starting to get the pairs of documents with over ", parameters_dictionary['t'], "% similarity...")
     t14 = time.time()
-    pairs = return_results(lsh_similarity_matrix, parameters_dictionary["t"])
+    pairs = return_results(lsh_similarity_matrix)
     t15 = time.time()
     print("The pairs of documents are:\n")
     for p in pairs:
@@ -396,3 +401,4 @@ if __name__ == '__main__':
         print("Naive similarity calculation took", t3 - t2, "sec")
 
     print("LSH process took in total", t13 - t4, "sec")
+    print(parameters_dictionary)
