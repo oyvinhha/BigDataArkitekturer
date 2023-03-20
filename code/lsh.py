@@ -198,7 +198,7 @@ def minHash(docs_signature_sets,pi):
 
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
-def lsh(m_matrix, r):
+def lsh(m_matrix):
     no_of_buckets=parameters_dictionary["k"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
