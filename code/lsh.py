@@ -239,7 +239,9 @@ def lsh(m_matrix, r, no_of_buckets):
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
             candidates.remove(pair)
-    candidates = list(dict.fromkeys(candidates))
+    print(candidates)
+    b_set = set(tuple(x) for x in candidates)
+    candidates = [ list(x) for x in b_set ]
     return candidates
 
 
