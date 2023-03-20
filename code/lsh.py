@@ -179,13 +179,13 @@ def minHash(docs_signature_sets,pi):
             a=permutation_matrix[i].index(pi_iter)          #a=rad 7,5,1,...
             for j in range(len(docs_signature_sets[0])):#number of docs. Iterating through a doc.
                 if docs_signature_sets[a][j]==1:
-                    print("sigrow",signature_row)
+                    #print("sigrow",signature_row)
                     if signature_row[j] ==0:
                         signature_row[j]=pi_iter
-                        print("sigrow",signature_row)
+                        #print("sigrow",signature_row)
 
             pi_iter+=1
-            print(signature_row)
+            #print(signature_row)
             #print("docs_signature_sets",docs_signature_sets)
             #print("len",len(docs_signature_sets))
             if ((not(0 in signature_row)) or (pi_iter>=len(docs_signature_sets))):
@@ -216,7 +216,7 @@ def lsh(m_matrix, r, no_of_buckets):
                 for i in range(start, end):
                     temp.append(m_matrix[i][row])
                 #print(temp)
-                #print(buckets)
+                print(buckets)
                 for index, bucket in enumerate(buckets):
                     if temp not in buckets:
                         buckets[row] = temp
@@ -234,6 +234,12 @@ def lsh(m_matrix, r, no_of_buckets):
         start = end
         end = start + r
     print(candidates)
+    for pair in candidates:
+        if len(pair) > 2:
+            for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
+                candidates.append(k)
+            candidates.remove(pair)
+    candidates = list(dict.fromkeys(candidates))
     return candidates
 
 
@@ -270,9 +276,14 @@ permutations"""
 
 # METHOD FOR TASK 6
 # Returns the document pairs of over t% similarity
-def return_results(lsh_similarity_matrix):
+def return_results(lsh_similarity_matrix, t):
     document_pairs = []
-
+    count = 0
+    for id, similarity in enumerate(lsh_similarity_matrix):
+        if similarity > t:
+            count += 1
+            document_pairs.append(candidate_docs[id])
+    print(f"There are {count} pairs.")
     # implement your code here
 
     return document_pairs
@@ -280,8 +291,11 @@ def return_results(lsh_similarity_matrix):
 
 # METHOD FOR TASK 6
 def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
+    print(lsh_similarity_matrix)
+    print(naive_similarity_matrix[:10])
     false_negatives = 0
     false_positives = 0
+
 
     # implement your code here
 
@@ -354,7 +368,7 @@ if __name__ == '__main__':
     # Return the over t similar pairs
     print("Starting to get the pairs of documents with over ", parameters_dictionary['t'], "% similarity...")
     t14 = time.time()
-    pairs = return_results(lsh_similarity_matrix)
+    pairs = return_results(lsh_similarity_matrix, parameters_dictionary["t"])
     t15 = time.time()
     print("The pairs of documents are:\n")
     for p in pairs:
