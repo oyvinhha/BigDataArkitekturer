@@ -124,6 +124,7 @@ def k_shingles():
         if os.path.isfile(f):
             print(f)
         total.append(k_shingles_one_doc(f))
+    #print("total",total)
     return total
         
         
@@ -133,15 +134,15 @@ def signature_set(k_shingles):
     docs_sig_sets = []
 
     # implement your code here
-    print(list(document_list.keys())[-1])
+    #print(list(document_list.keys())[-1])
     #signature = []
     shingles = []
-    for document in tqdm(k_shingles):
+    for document in k_shingles:
         for shingle in document:
             if shingle not in shingles:
                 shingles.append(shingle)
 
-    print(shingles)
+    print("Total amount of shingles: ",len(shingles))
     for i, v in tqdm(enumerate(shingles)):
         temp_list = np.zeros(len(k_shingles))
         for ind, document in enumerate(k_shingles):
@@ -149,7 +150,7 @@ def signature_set(k_shingles):
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
         print(temp_list)
-    print(docs_sig_sets)
+    #print("docs_sig_sets",docs_sig_sets)
     return docs_sig_sets
 
 
@@ -157,7 +158,7 @@ def signature_set(k_shingles):
 # Creates the minHash signatures after simulation of permutations
 def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
-    print("docs_signature_sets:",docs_signature_sets)
+    #print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
     for i in tqdm(range(pi)):
         tilfeldig=[]
@@ -165,7 +166,7 @@ def minHash(docs_signature_sets):
             tilfeldig.append(j)
         random.shuffle(tilfeldig)
         permutation_matrix.append(tilfeldig)
-    print("permutation matrix:",permutation_matrix)
+    #print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
     
@@ -189,19 +190,19 @@ def minHash(docs_signature_sets):
             #print("docs_signature_sets",docs_signature_sets)
             #print("len",len(docs_signature_sets))
             if ((not(0 in signature_row)) or (pi_iter>=len(docs_signature_sets))):
-                print("pi_iter",pi_iter)
+                #print("pi_iter",pi_iter)
                 min_hash_signatures.append(signature_row)
                 break
     
 
-    print("min_hash_signatures:",min_hash_signatures)
+    #print("min_hash_signatures:",min_hash_signatures)
     return min_hash_signatures
 
 
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
-    no_of_buckets=parameters_dictionary["k"]
+    no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
 
@@ -209,6 +210,7 @@ def lsh(m_matrix):
     b = len(m_matrix)//r
     start = 0
     end = start + r
+    comparisons=0
     for band in tqdm(range(b)):
         buckets = [[] for _ in range(no_of_buckets)]
         bucket_candidates = [[] for _ in range(no_of_buckets)]
@@ -216,6 +218,7 @@ def lsh(m_matrix):
             temp = []
             try:
                 for i in range(start, end):
+                    comparisons+=1
                     temp.append(m_matrix[i][row])
                 #print(temp)
                 #print(buckets)
@@ -235,15 +238,16 @@ def lsh(m_matrix):
                 candidates.append(candidate)
         start = end
         end = start + r
-    print(candidates)
+    #print(candidates)
     for pair in candidates:
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
             candidates.remove(pair)
-    print(candidates)
+    #print(candidates)
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
+    print(comparisons)
     return candidates
 
 
@@ -257,7 +261,7 @@ i.e.
 similarity(d1, d2) = #(hi(d1) == hi(d2))
 permutations"""
     #candidate_docs [[4, 5], [2, 4]]
-    print("lengde på candidates",len(candidate_docs))
+    #print("lengde på candidates",len(candidate_docs))
     #min_hash_matrix [[5, 7, 3, 1, 1, 1.0], [5, 5, 5, 2, 1, 1.0], [2, 3, 4, 1, 4, 1.0], [1, 1, 1, 2, 1, 1.0]]
 
     similarity_matrix=np.zeros(len(candidate_docs))
@@ -272,7 +276,7 @@ permutations"""
         
     similarity_matrix/=len(min_hash_matrix)
 
-    print("sim_matrix:",similarity_matrix)
+    #print("sim_matrix:",similarity_matrix)
     # implement your code here
 
     return similarity_matrix
@@ -295,7 +299,7 @@ def return_results(lsh_similarity_matrix):
 
 
 # METHOD FOR TASK 6
-def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
+def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
     t = parameters_dictionary["t"]
     #print(naive_similarity_matrix[:10])
     false_negatives = 0
@@ -320,8 +324,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']="true"
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
 
     # Reading the data
     print("Data reading...")
@@ -331,8 +335,6 @@ if __name__ == '__main__':
     document_list = {k: document_list[k] for k in sorted(document_list)}
     t1 = time.time()
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
-
-    
 
     # Naive
     naive_similarity_matrix = []
@@ -402,4 +404,6 @@ if __name__ == '__main__':
         print("Naive similarity calculation took", t3 - t2, "sec")
 
     print("LSH process took in total", t13 - t4, "sec")
-    print(parameters_dictionary)
+    #print(parameters_dictionary)
+    print("candidate_docs:",candidate_docs)
+
