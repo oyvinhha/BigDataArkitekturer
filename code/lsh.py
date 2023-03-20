@@ -218,7 +218,7 @@ def lsh(m_matrix):
                 for i in range(start, end):
                     temp.append(m_matrix[i][row])
                 #print(temp)
-                print(buckets)
+                #print(buckets)
                 for index, bucket in enumerate(buckets):
                     if temp not in buckets:
                         buckets[row] = temp
@@ -295,11 +295,18 @@ def return_results(lsh_similarity_matrix):
 
 
 # METHOD FOR TASK 6
-def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
-    print(lsh_similarity_matrix)
-    print(naive_similarity_matrix[:10])
+def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
+    t = parameters_dictionary["t"]
+    #print(naive_similarity_matrix[:10])
     false_negatives = 0
     false_positives = 0
+    for id, similarity in enumerate(lsh_similarity_matrix):
+        naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
+        #print(naive_sim)
+        if similarity > t and naive_sim <= t:
+            false_positives += 1
+        elif similarity <= t and naive_sim > t:
+            false_negatives += 1
 
 
     # implement your code here
@@ -313,6 +320,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
 
     # Reading the data
     print("Data reading...")
@@ -323,8 +332,7 @@ if __name__ == '__main__':
     t1 = time.time()
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
 
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']=''
+    
 
     # Naive
     naive_similarity_matrix = []
@@ -386,7 +394,7 @@ if __name__ == '__main__':
     if parameters_dictionary['naive']:
         print("Starting to calculate the false negatives and positives...")
         t16 = time.time()
-        false_negatives, false_positives = count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix)
+        false_negatives, false_positives = count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, parameters_dictionary["t"])
         t17 = time.time()
         print("False negatives = ", false_negatives, "\nFalse positives = ", false_positives, "\n\n")
 
