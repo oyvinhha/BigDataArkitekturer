@@ -137,7 +137,7 @@ def signature_set(k_shingles):
     #print(list(document_list.keys())[-1])
     #signature = []
 
-    shingles = [[el] for el in np.unique(np.array(k_shingles).flatten()).tolist()]
+    shingles = list(set(tuple(sorted(sub)) for sub in sum(k_shingles, [])))
 
     print("Total amount of shingles: ",len(shingles))
     for i, v in tqdm(enumerate(shingles)):
@@ -237,7 +237,9 @@ def lsh(m_matrix):
         start = end
         end = start + r
     #print(candidates)
+    #print(candidates)
     for pair in candidates:
+        #print(pair, len(pair))
         #print(pair, len(pair))
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
@@ -323,9 +325,9 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']="true"
-    parameters_dictionary['k']=5
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
+    parameters_dictionary['k']=1
 
     # Reading the data
     print("Data reading...")
@@ -373,7 +375,7 @@ if __name__ == '__main__':
     candidate_docs = lsh(min_hash_signatures)
     t11 = time.time()
     print("LSH took", t11 - t10, "sec\n")
-    print("LSH candidate docs: ",candidate_docs)
+    #print("LSH candidate docs: ",candidate_docs)
 
     # Candidate similarities
     print("Starting to calculate similarities of the candidate documents...")
@@ -388,9 +390,9 @@ if __name__ == '__main__':
     pairs = return_results(lsh_similarity_matrix)
     t15 = time.time()
     print("The pairs of documents are:\n")
-    for p in pairs:
-        print(p)
-    print("\n")
+    #for p in pairs:
+    #    print(p)
+    #print("\n")
 
     # Count false negatives and positives
     if parameters_dictionary['naive']:
