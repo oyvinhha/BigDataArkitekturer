@@ -84,7 +84,7 @@ def naive():
     # Using triangular array to store the similarities, avoiding half size and similarities of i==j
     num_elems = int(len(docs_Sets) * (len(docs_Sets) - 1) / 2)
     similarity_matrix = [0 for x in range(num_elems)]
-    for i in range(len(docs_Sets)):
+    for i in tqdm(range(len(docs_Sets))):
         for j in range(i + 1, len(docs_Sets)):
             similarity_matrix[get_triangle_index(i, j, len(docs_Sets))] = jaccard(docs_Sets[i], docs_Sets[j])
 
@@ -136,13 +136,13 @@ def signature_set(k_shingles):
     print(list(document_list.keys())[-1])
     #signature = []
     shingles = []
-    for document in k_shingles:
+    for document in tqdm(k_shingles):
         for shingle in document:
             if shingle not in shingles:
                 shingles.append(shingle)
 
     print(shingles)
-    for i, v in enumerate(shingles):
+    for i, v in tqdm(enumerate(shingles)):
         temp_list = np.zeros(len(k_shingles))
         for ind, document in enumerate(k_shingles):
             if v in document:
@@ -159,7 +159,7 @@ def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
     print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
-    for i in range(pi):
+    for i in tqdm(range(pi)):
         tilfeldig=[]
         for j in range(len(docs_signature_sets)):           #shape[1]??
             tilfeldig.append(j)
@@ -169,7 +169,7 @@ def minHash(docs_signature_sets):
 
     min_hash_signatures = []
     
-    for i in range(pi):
+    for i in tqdm(range(pi)):
         pi_iter=0
         signature_row=np.empty(len(docs_signature_sets[0]))
         signature_row=signature_row.tolist()
@@ -209,7 +209,7 @@ def lsh(m_matrix):
     b = len(m_matrix)//r
     start = 0
     end = start + r
-    for band in range(b):
+    for band in tqdm(range(b)):
         buckets = [[] for _ in range(no_of_buckets)]
         bucket_candidates = [[] for _ in range(no_of_buckets)]
         for row in range(len(m_matrix[0])):
@@ -262,7 +262,7 @@ permutations"""
 
     similarity_matrix=np.zeros(len(candidate_docs))
 
-    for i in range(len(candidate_docs)):
+    for i in tqdm(range(len(candidate_docs))):
         nr1=candidate_docs[i][0]
         nr2=candidate_docs[i][1]
 
@@ -284,7 +284,7 @@ def return_results(lsh_similarity_matrix):
     t=parameters_dictionary['t']
     document_pairs = []
     count = 0
-    for id, similarity in enumerate(lsh_similarity_matrix):
+    for id, similarity in tqdm(enumerate(lsh_similarity_matrix)):
         if similarity > t:
             count += 1
             document_pairs.append(candidate_docs[id])
@@ -324,7 +324,7 @@ if __name__ == '__main__':
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
 
     parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']=''
+    #parameters_dictionary['naive']=''
 
     # Naive
     naive_similarity_matrix = []
