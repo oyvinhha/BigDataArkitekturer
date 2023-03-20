@@ -8,6 +8,9 @@ import time  # for timing
 import random
 from tqdm import tqdm
 import numpy as np
+import math
+ 
+
 
 # Global parameters
 parameter_file = 'default_parameters.ini'  # the main parameters file
@@ -238,8 +241,28 @@ def lsh(m_matrix, r, no_of_buckets):
 # METHOD FOR TASK 5
 # Calculates the similarities of the candidate documents
 def candidates_similarities(candidate_docs, min_hash_matrix):
-    similarity_matrix = []
+    """For the candidate document pairs from the previous task, calculate the document
+signature sets similarity using the fraction of the hash functions which they agree,
+i.e.
+similarity(d1, d2) = #(hi(d1) == hi(d2))
+permutations"""
+    #candidate_docs [[4, 5], [2, 4]]
+    print("lengde på candidates",len(candidate_docs))
+    #min_hash_matrix [[5, 7, 3, 1, 1, 1.0], [5, 5, 5, 2, 1, 1.0], [2, 3, 4, 1, 4, 1.0], [1, 1, 1, 2, 1, 1.0]]
 
+    similarity_matrix=np.zeros(len(candidate_docs))
+
+    for i in range(len(candidate_docs)):
+        nr1=candidate_docs[i][0]
+        nr2=candidate_docs[i][1]
+
+        for j in range(len(min_hash_matrix)):
+            if min_hash_matrix[j][nr1]==min_hash_matrix[j][nr2]:
+                similarity_matrix[i]+=1
+        
+    similarity_matrix/=len(min_hash_matrix)
+
+    print("sim_matrix:",similarity_matrix)
     # implement your code here
 
     return similarity_matrix
@@ -319,6 +342,7 @@ if __name__ == '__main__':
     candidate_docs = lsh(min_hash_signatures, 2, 10)
     t11 = time.time()
     print("LSH took", t11 - t10, "sec\n")
+    print("LSH candidate docs: ",candidate_docs)
 
     # Candidate similarities
     print("Starting to calculate similarities of the candidate documents...")
