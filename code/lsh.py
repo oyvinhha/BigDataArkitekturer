@@ -122,7 +122,7 @@ def k_shingles():
         f = os.path.join(directory, filename)
         # checking if it is a file
         #if os.path.isfile(f):
-        #    print(f)
+            #print(f)
         total.append(k_shingles_one_doc(f))
     #print("total",total)
     return total
@@ -136,16 +136,8 @@ def signature_set(k_shingles):
     # implement your code here
     #print(list(document_list.keys())[-1])
     #signature = []
-    #shingles = []
 
-    k_shingles=np.array(k_shingles)
-    k_shingles.flatten()
-    shingles = np.unique(k_shingles)
-
-    """    for document in tqdm(k_shingles):
-        for shingle in document:
-            if shingle not in shingles:
-                shingles.append(shingle)"""
+    shingles = [[el] for el in np.unique(np.array(k_shingles).flatten()).tolist()]
 
     print("Total amount of shingles: ",len(shingles))
     for i, v in tqdm(enumerate(shingles)):
@@ -155,7 +147,8 @@ def signature_set(k_shingles):
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
         #print(temp_list)
-    #print("docs_sig_sets",docs_sig_sets)
+    #print(docs_sig_sets)
+    print(f"Number of shingles {len(shingles)}")
     return docs_sig_sets
 
 
@@ -215,7 +208,7 @@ def lsh(m_matrix):
     b = len(m_matrix)//r
     start = 0
     end = start + r
-    comparisons=0
+    comparisons = 0
     for band in tqdm(range(b)):
         buckets = [[] for _ in range(no_of_buckets)]
         bucket_candidates = [[] for _ in range(no_of_buckets)]
@@ -223,7 +216,7 @@ def lsh(m_matrix):
             temp = []
             try:
                 for i in range(start, end):
-                    comparisons+=1
+                    comparisons += 1
                     temp.append(m_matrix[i][row])
                 #print(temp)
                 #print(buckets)
@@ -243,16 +236,17 @@ def lsh(m_matrix):
                 candidates.append(candidate)
         start = end
         end = start + r
-    #print(candidates)
+    print(candidates)
     for pair in candidates:
+        print(pair, len(pair))
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
-            candidates.remove(pair)
+            candidates = [i for i in candidates if i != pair]
     #print(candidates)
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
-    print(comparisons)
+    print(f"number of comparisons = {comparisons}")
     return candidates
 
 
@@ -329,8 +323,9 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']="true"
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
+    parameters_dictionary['k']=1
 
     # Reading the data
     print("Data reading...")
