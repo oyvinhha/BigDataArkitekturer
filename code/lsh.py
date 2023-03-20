@@ -133,7 +133,7 @@ def signature_set(k_shingles):
     docs_sig_sets = []
 
     # implement your code here
-    print(list(document_list.keys())[-1])
+    #print(list(document_list.keys())[-1])
     #signature = []
     shingles = []
     for document in tqdm(k_shingles):
@@ -141,15 +141,16 @@ def signature_set(k_shingles):
             if shingle not in shingles:
                 shingles.append(shingle)
 
-    print(shingles)
+    #print(shingles)
     for i, v in tqdm(enumerate(shingles)):
         temp_list = np.zeros(len(k_shingles))
         for ind, document in enumerate(k_shingles):
             if v in document:
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
-        print(temp_list)
-    print(docs_sig_sets)
+        #print(temp_list)
+    #print(docs_sig_sets)
+    print(f"Number of shingles {len(shingles)}")
     return docs_sig_sets
 
 
@@ -201,7 +202,7 @@ def minHash(docs_signature_sets):
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
-    no_of_buckets=parameters_dictionary["k"]
+    no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
 
@@ -209,6 +210,7 @@ def lsh(m_matrix):
     b = len(m_matrix)//r
     start = 0
     end = start + r
+    comparisons = 0
     for band in tqdm(range(b)):
         buckets = [[] for _ in range(no_of_buckets)]
         bucket_candidates = [[] for _ in range(no_of_buckets)]
@@ -216,6 +218,7 @@ def lsh(m_matrix):
             temp = []
             try:
                 for i in range(start, end):
+                    comparisons += 1
                     temp.append(m_matrix[i][row])
                 #print(temp)
                 #print(buckets)
@@ -235,15 +238,17 @@ def lsh(m_matrix):
                 candidates.append(candidate)
         start = end
         end = start + r
-    print(candidates)
+    #print(candidates)
     for pair in candidates:
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
             candidates.remove(pair)
-    print(candidates)
+    #print(candidates)
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
+    print(f"number of comparisons = {comparisons}")
+    print(f"Document pairs checked = {candidates}")
     return candidates
 
 
@@ -295,7 +300,7 @@ def return_results(lsh_similarity_matrix):
 
 
 # METHOD FOR TASK 6
-def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix, t):
+def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
     t = parameters_dictionary["t"]
     #print(naive_similarity_matrix[:10])
     false_negatives = 0
@@ -320,8 +325,9 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']="true"
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
+    parameters_dictionary['k']=1
 
     # Reading the data
     print("Data reading...")
