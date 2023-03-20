@@ -121,9 +121,10 @@ def k_shingles():
     for filename in tqdm(os.listdir(directory)):
         f = os.path.join(directory, filename)
         # checking if it is a file
-        if os.path.isfile(f):
-            print(f)
+        #if os.path.isfile(f):
+            #print(f)
         total.append(k_shingles_one_doc(f))
+    #print("total",total)
     return total
         
         
@@ -135,13 +136,10 @@ def signature_set(k_shingles):
     # implement your code here
     #print(list(document_list.keys())[-1])
     #signature = []
-    shingles = []
-    for document in tqdm(k_shingles):
-        for shingle in document:
-            if shingle not in shingles:
-                shingles.append(shingle)
 
-    #print(shingles)
+    shingles = [[el] for el in np.unique(np.array(k_shingles).flatten()).tolist()]
+
+    print("Total amount of shingles: ",len(shingles))
     for i, v in tqdm(enumerate(shingles)):
         temp_list = np.zeros(len(k_shingles))
         for ind, document in enumerate(k_shingles):
@@ -158,7 +156,7 @@ def signature_set(k_shingles):
 # Creates the minHash signatures after simulation of permutations
 def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
-    print("docs_signature_sets:",docs_signature_sets)
+    #print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
     for i in tqdm(range(pi)):
         tilfeldig=[]
@@ -166,7 +164,7 @@ def minHash(docs_signature_sets):
             tilfeldig.append(j)
         random.shuffle(tilfeldig)
         permutation_matrix.append(tilfeldig)
-    print("permutation matrix:",permutation_matrix)
+    #print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
     
@@ -190,12 +188,12 @@ def minHash(docs_signature_sets):
             #print("docs_signature_sets",docs_signature_sets)
             #print("len",len(docs_signature_sets))
             if ((not(0 in signature_row)) or (pi_iter>=len(docs_signature_sets))):
-                print("pi_iter",pi_iter)
+                #print("pi_iter",pi_iter)
                 min_hash_signatures.append(signature_row)
                 break
     
 
-    print("min_hash_signatures:",min_hash_signatures)
+    #print("min_hash_signatures:",min_hash_signatures)
     return min_hash_signatures
 
 
@@ -238,17 +236,17 @@ def lsh(m_matrix):
                 candidates.append(candidate)
         start = end
         end = start + r
-    #print(candidates)
+    print(candidates)
     for pair in candidates:
+        print(pair, len(pair))
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
-            candidates.remove(pair)
+            candidates = [i for i in candidates if i != pair]
     #print(candidates)
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
     print(f"number of comparisons = {comparisons}")
-    print(f"Document pairs checked = {candidates}")
     return candidates
 
 
@@ -262,7 +260,7 @@ i.e.
 similarity(d1, d2) = #(hi(d1) == hi(d2))
 permutations"""
     #candidate_docs [[4, 5], [2, 4]]
-    print("lengde på candidates",len(candidate_docs))
+    #print("lengde på candidates",len(candidate_docs))
     #min_hash_matrix [[5, 7, 3, 1, 1, 1.0], [5, 5, 5, 2, 1, 1.0], [2, 3, 4, 1, 4, 1.0], [1, 1, 1, 2, 1, 1.0]]
 
     similarity_matrix=np.zeros(len(candidate_docs))
@@ -277,7 +275,7 @@ permutations"""
         
     similarity_matrix/=len(min_hash_matrix)
 
-    print("sim_matrix:",similarity_matrix)
+    #print("sim_matrix:",similarity_matrix)
     # implement your code here
 
     return similarity_matrix
@@ -337,8 +335,6 @@ if __name__ == '__main__':
     document_list = {k: document_list[k] for k in sorted(document_list)}
     t1 = time.time()
     print(len(document_list), "documents were read in", t1 - t0, "sec\n")
-
-    
 
     # Naive
     naive_similarity_matrix = []
@@ -408,4 +404,6 @@ if __name__ == '__main__':
         print("Naive similarity calculation took", t3 - t2, "sec")
 
     print("LSH process took in total", t13 - t4, "sec")
-    print(parameters_dictionary)
+    #print(parameters_dictionary)
+    print("candidate_docs:",len(candidate_docs))
+
