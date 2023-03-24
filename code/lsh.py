@@ -137,18 +137,24 @@ def signature_set(k_shingles):
     #print(list(document_list.keys())[-1])
     #signature = []
 
-    shingles = list(set(tuple(sorted(sub)) for sub in sum(k_shingles, [])))
+    shingles = np.array(list(set(tuple(sorted(sub)) for sub in sum(k_shingles, []))))
 
     print("Total amount of shingles: ",len(shingles))
-    for i, v in tqdm(enumerate(shingles)):
-        temp_list = np.zeros(len(k_shingles))
-        for ind, document in enumerate(k_shingles):
-            if v in document:
+    #start = time.time()
+    k_shingles = np.array(k_shingles)
+    #shingles = np.array(shingles)
+    size = len(k_shingles)
+    for v in tqdm(shingles):
+        temp_list = np.zeros(size)
+        for ind in range(k_shingles.shape[0]):
+            if v in k_shingles[ind]:
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
         #print(temp_list)
     #print(docs_sig_sets)
     print(f"Number of shingles {len(shingles)}")
+    #end = time.time()
+    #print(end-start)
     return docs_sig_sets
 
 
@@ -158,25 +164,26 @@ def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
     #print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
+    docs_signature_sets = np.array(docs_signature_sets)
+    doc_size = docs_signature_sets.shape[0]
+    tilfeldig=[]
+    for j in range(doc_size):           #shape[1]??
+        tilfeldig.append(j)
     for i in tqdm(range(pi)):
-        tilfeldig=[]
-        for j in range(len(docs_signature_sets)):           #shape[1]??
-            tilfeldig.append(j)
         random.shuffle(tilfeldig)
-        permutation_matrix.append(tilfeldig)
-    #print("permutation matrix:",permutation_matrix)
+        permutation_matrix.append(tilfeldig.copy())
+    print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
     
     for i in tqdm(range(pi)):
         pi_iter=0
-        signature_row=np.empty(len(docs_signature_sets[0]))
-        signature_row=signature_row.tolist()
+        signature_row=np.empty(docs_signature_sets.shape[1]).tolist()
         #for iter in range(len(docs_signature_sets)):
         while True:
             #print("sigrow of 0's",signature_row)#ok
             a=permutation_matrix[i].index(pi_iter)          #a=rad 7,5,1,...
-            for j in range(len(docs_signature_sets[0])):#number of docs. Iterating through a doc.
+            for j in range(docs_signature_sets.shape[1]):#number of docs. Iterating through a doc.
                 if docs_signature_sets[a][j]==1:
                     #print("sigrow",signature_row)
                     if signature_row[j] ==0:
@@ -187,12 +194,10 @@ def minHash(docs_signature_sets):
             #print(signature_row)
             #print("docs_signature_sets",docs_signature_sets)
             #print("len",len(docs_signature_sets))
-            if ((not(0 in signature_row)) or (pi_iter>=len(docs_signature_sets))):
+            if ((0 not in signature_row) or (pi_iter>=doc_size)):
                 #print("pi_iter",pi_iter)
                 min_hash_signatures.append(signature_row)
                 break
-    
-
     #print("min_hash_signatures:",min_hash_signatures)
     return min_hash_signatures
 
@@ -205,28 +210,29 @@ def lsh(m_matrix):
     candidates = []  # list of candidate sets of documents for checking similarity
 
     # implement your code here
-    b = len(m_matrix)//r
+    m_matrix = np.array(m_matrix)
+    b = m_matrix.shape[0]//r
     start = 0
     end = start + r
     comparisons = 0
     for band in tqdm(range(b)):
-        buckets = [[] for _ in range(no_of_buckets)]
-        bucket_candidates = [[] for _ in range(no_of_buckets)]
-        for row in range(len(m_matrix[0])):
+        buckets = np.empty(shape=(no_of_buckets,2))
+        bucket_candidates = [[] for i in range(b)]
+        for row in range(m_matrix.shape[1]):
             temp = []
             try:
                 for i in range(start, end):
                     comparisons += 1
                     temp.append(m_matrix[i][row])
                 #print(temp)
-                #print(buckets)
+                #print(bucket_candidates)
                 for index, bucket in enumerate(buckets):
-                    if temp not in buckets:
+                    if not any(np.array_equal(x, temp) for x in buckets):
                         buckets[row] = temp
                         bucket_candidates[row].append(row)
                         break
                     else:
-                        if temp == bucket:
+                        if np.array_equal(temp, bucket):
                             bucket_candidates[index].append(row)
             except:
                 pass
@@ -234,6 +240,7 @@ def lsh(m_matrix):
         for candidate in bucket_candidates:
             if len(candidate) > 1:
                 candidates.append(candidate)
+        #print("candidates", candidates)
         start = end
         end = start + r
     #print(candidates)
