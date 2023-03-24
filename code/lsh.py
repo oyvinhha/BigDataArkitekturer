@@ -141,13 +141,12 @@ def signature_set(k_shingles):
 
     print("Total amount of shingles: ",len(shingles))
     #start = time.time()
-    k_shingles = np.array(k_shingles)
     #shingles = np.array(shingles)
     size = len(k_shingles)
     for v in tqdm(shingles):
         temp_list = np.zeros(size)
-        for ind in range(k_shingles.shape[0]):
-            if v in k_shingles[ind]:
+        for ind in range(size):
+            if any(np.array_equal(x, v) for x in k_shingles[ind]):
                 temp_list[ind] = 1
         docs_sig_sets.append(list(temp_list))
         #print(temp_list)
@@ -334,7 +333,7 @@ if __name__ == '__main__':
     read_parameters()
     parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
-    parameters_dictionary['k']=1
+    parameters_dictionary['k']=5
 
     # Reading the data
     print("Data reading...")
