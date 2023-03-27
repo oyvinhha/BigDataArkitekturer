@@ -142,24 +142,33 @@ def signature_set(k_shingles):
     for doc in k_shingles:
         sorted_docs.append(sorted(doc))
     k_shingles = sorted_docs
+    print("SORTERT")
 
     for v in tqdm(shingles):
         temp_list = np.zeros(size)
+        temp_list2 = np.array([i[0] if len(i) == size else [""]*size for i in k_shingles])
+        ind = np.where((temp_list2 == np.array(v)).all(axis=1))
+        for i in ind[0]:
+            k_shingles[i].pop(0)
+        temp_list[ind] = 1
+
+        """
+        print(temp_list2)
         for ind in range(size):
             if len(k_shingles[ind]) > 0:
-                if (list(v) == k_shingles[ind][0]):
+                if (v == set(k_shingles[ind][0])):
                     temp_list[ind] = 1
-                    print("ddddddddd")
-                    k_shingles[ind].pop(0)
+                    #print("ddddddddd")
+                    k_shingles[ind] = k_shingles[ind][1:]
         #print(k_shingles)
+        
         
         if first_iter:
             docs_sig_sets=np.array(list(temp_list))
             first_iter=False
         else:
             docs_sig_sets=np.vstack([docs_sig_sets,list(temp_list)])
-
-    print(f"Number of shingles {len(shingles)}")
+    print(f"Number of shingles {len(shingles)}")"""
 
     #print("docs_sig_sets",docs_sig_sets)
     return docs_sig_sets
@@ -375,8 +384,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    #parameters_dictionary['naive']="true"
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
 
     # Reading the data
