@@ -151,8 +151,8 @@ def signature_set(k_shingles):
         for ind in range(size):
             if any(np.array_equal(x, v) for x in k_shingles[ind]):
                 temp_list[ind] = 1
-                l = np.array(k_shingles[ind])
-                k_shingles[ind] = [j for j in k_shingles[ind] if not all(x == y for x,y in zip(j, v))]
+                #l = np.array(k_shingles[ind])
+                #k_shingles[ind] = [j for j in k_shingles[ind] if not all(x == y for x,y in zip(j, v))]
         docs_sig_sets.append(list(temp_list))
         #print(temp_list)            
     print(docs_sig_sets)
@@ -220,28 +220,28 @@ def lsh(m_matrix):
     # implement your code here
     m_matrix = np.array(m_matrix)
     b = m_matrix.shape[0]//r
+    print(m_matrix)
     start = 0
     end = start + r
     comparisons = 0
     for band in tqdm(range(b)):
-        buckets = np.empty(shape=(no_of_buckets,2))
-        bucket_candidates = [[] for i in range(b)]
-        for row in range(m_matrix.shape[1]):
+        buckets = []
+        bucket_candidates = []
+        for column in range(m_matrix.shape[1]):
             temp = []
             try:
                 for i in range(start, end):
                     comparisons += 1
-                    temp.append(m_matrix[i][row])
+                    temp.append(m_matrix[i][column])
                 #print(temp)
-                #print(bucket_candidates)
-                for index, bucket in enumerate(buckets):
-                    if not any(np.array_equal(x, temp) for x in buckets):
-                        buckets[row] = temp
-                        bucket_candidates[row].append(row)
-                        break
-                    else:
+                if not any(np.array_equal(x, temp) for x in buckets) and (len(buckets) < no_of_buckets):
+                    buckets.append(temp)
+                    bucket_candidates.append([column])
+                else:
+                    for index, bucket in enumerate(buckets):
                         if np.array_equal(temp, bucket):
-                            bucket_candidates[index].append(row)
+                            bucket_candidates[index].append(column)
+                #print(bucket_candidates)
             except:
                 pass
         #print("v",bucket_candidates)
@@ -285,14 +285,17 @@ permutations"""
     for i in tqdm(range(len(candidate_docs))):
         nr1=candidate_docs[i][0]
         nr2=candidate_docs[i][1]
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #print(min_hash_matrix)
 
-        for j in range(len(min_hash_matrix)):
-            if min_hash_matrix[j][nr1]==min_hash_matrix[j][nr2]:
+        for j in range(len(min_hash_matrix[0])):
+            if min_hash_matrix[nr1][j]==min_hash_matrix[nr2][j]:
                 similarity_matrix[i]+=1
         
-    similarity_matrix/=len(min_hash_matrix)
+    #print(similarity_matrix)
+    similarity_matrix/=len(min_hash_matrix[0])
 
-    #print("sim_matrix:",similarity_matrix)
+    print("sim_matrix:",similarity_matrix)
     # implement your code here
 
     return similarity_matrix
@@ -340,8 +343,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']="true"
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
 
     # Reading the data
