@@ -131,6 +131,39 @@ def k_shingles():
 # METHOD FOR TASK 2
 # Creates a signatures set of the documents from the k-shingles list
 def signature_set(k_shingles):
+    docs_sig_sets = np.array([])
+    first_iter=True
+
+    shingles = list(sorted(set(tuple(sub) for sub in sum(k_shingles, []))))
+    print("Total amount of shingles: ",len(shingles))
+    size = len(k_shingles)
+    #print(size)
+    sorted_docs = []
+    for doc in k_shingles:
+        sorted_docs.append(sorted(doc))
+    k_shingles = sorted_docs
+
+    for v in tqdm(shingles):
+        temp_list = np.zeros(size)
+        for ind in range(size):
+            if len(k_shingles[ind]) > 0:
+                if (list(v) == k_shingles[ind][0]):
+                    temp_list[ind] = 1
+                    print("ddddddddd")
+                    k_shingles[ind].pop(0)
+        #print(k_shingles)
+        
+        if first_iter:
+            docs_sig_sets=np.array(list(temp_list))
+            first_iter=False
+        else:
+            docs_sig_sets=np.vstack([docs_sig_sets,list(temp_list)])
+
+    print(f"Number of shingles {len(shingles)}")
+
+    #print("docs_sig_sets",docs_sig_sets)
+    return docs_sig_sets
+
     docs_sig_sets = []
 
     # implement your code here
@@ -180,7 +213,7 @@ def minHash(docs_signature_sets):
     for i in tqdm(range(pi)):
         random.shuffle(tilfeldig)
         permutation_matrix.append(tilfeldig.copy())
-    print("permutation matrix:",permutation_matrix)
+    #print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
     
@@ -220,7 +253,6 @@ def lsh(m_matrix):
     # implement your code here
     m_matrix = np.array(m_matrix)
     b = m_matrix.shape[0]//r
-    print(m_matrix)
     start = 0
     end = start + r
     comparisons = 0
@@ -343,8 +375,8 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']="true"
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
 
     # Reading the data
