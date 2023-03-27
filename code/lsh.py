@@ -131,6 +131,33 @@ def k_shingles():
 # METHOD FOR TASK 2
 # Creates a signatures set of the documents from the k-shingles list
 def signature_set(k_shingles):
+    docs_sig_sets = np.array([])
+    first_iter=True
+
+    shingles = np.array(list(set(tuple(sub) for sub in sum(k_shingles, []))))
+
+    print("Total amount of shingles: ",len(shingles))
+    size = len(k_shingles)
+
+    for v in tqdm(shingles):
+        temp_list = np.zeros(size)
+        for ind in range(size):
+            if any(np.array_equal(x, v) for x in k_shingles[ind]):
+                temp_list[ind] = 1
+                l = np.array(k_shingles[ind])
+                k_shingles[ind] = [j for j in k_shingles[ind] if not all(x == y for x,y in zip(j, v))]
+        
+        if first_iter:
+            docs_sig_sets=np.array(list(temp_list))
+            first_iter=False
+        else:
+            docs_sig_sets=np.vstack([docs_sig_sets,list(temp_list)])
+
+    print(f"Number of shingles {len(shingles)}")
+
+    print("docs_sig_sets",docs_sig_sets)
+    return docs_sig_sets
+
     docs_sig_sets = []
 
     # implement your code here
@@ -343,7 +370,7 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     #parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
 
