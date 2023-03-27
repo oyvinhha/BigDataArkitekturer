@@ -137,19 +137,28 @@ def signature_set(k_shingles):
     #print(list(document_list.keys())[-1])
     #signature = []
 
-    shingles = np.array(list(set(tuple(sorted(sub)) for sub in sum(k_shingles, []))))
+    shingles = np.array(list(set(tuple(sub) for sub in sum(k_shingles, []))))
 
     print("Total amount of shingles: ",len(shingles))
     #start = time.time()
     #shingles = np.array(shingles)
     size = len(k_shingles)
+    #print(shingles)
+    #print(k_shingles)
+    start = time.time()
     for v in tqdm(shingles):
         temp_list = np.zeros(size)
         for ind in range(size):
             if any(np.array_equal(x, v) for x in k_shingles[ind]):
                 temp_list[ind] = 1
+                l = np.array(k_shingles[ind])
+                k_shingles[ind] = [j for j in k_shingles[ind] if not all(x == y for x,y in zip(j, v))]
         docs_sig_sets.append(list(temp_list))
-        #print(temp_list)
+        #print(temp_list)            
+    print(docs_sig_sets)
+    end = time.time()
+    print(end-start)
+    #print(docs_sig_sets)
     #print(docs_sig_sets)
     print(f"Number of shingles {len(shingles)}")
     #end = time.time()
