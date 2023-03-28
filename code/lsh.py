@@ -9,7 +9,7 @@ import random
 from tqdm import tqdm
 import numpy as np
 import math
- 
+import re
 
 
 # Global parameters
@@ -102,7 +102,7 @@ def k_shingles_one_doc(document_file):
 
         for line in file:
             for word in line.split():
-                words.append(word)
+                words.append(re.sub('\W+','', word.lower()))               
     
         for i in range(len(words)):
             try:
@@ -221,18 +221,20 @@ def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
     #print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
-    for i in docs_signature_sets:
-        print(i)
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
+    print(doc_size)
     tilfeldig=[]
-    for j in range(1, doc_size+1):           #shape[1]??
+    for j in range(1, (doc_size+1)//2):
         tilfeldig.append(j)
+    tilfeldig = tilfeldig*2
+    print(tilfeldig)
+    if len(tilfeldig) < doc_size:
+        for i in range(doc_size-len(tilfeldig)):
+            tilfeldig.append(random.randint(1, (doc_size+1)//2))
     for i in tqdm(range(pi)):
-        random.shuffle(tilfeldig)
+        random.shuffle(tilfeldig)      
         permutation_matrix.append(tilfeldig.copy())
-    for i in permutation_matrix:
-        print(i)
     #print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
@@ -243,13 +245,17 @@ def minHash(docs_signature_sets):
         #for iter in range(len(docs_signature_sets)):
         while True:
             #print("sigrow of 0's",signature_row)#ok
-            a=permutation_matrix[i].index(pi_iter)          #a=rad 7,5,1,...
-            for j in range(docs_signature_sets.shape[1]):#number of docs. Iterating through a doc.
-                if docs_signature_sets[a][j]==1:
-                    #print("sigrow",signature_row)
-                    if signature_row[j] ==0:
-                        signature_row[j]=pi_iter
-                        continue
+            a=np.where(np.array(permutation_matrix[i]) == pi_iter)
+            #print(permutation_matrix[i], pi_iter)   #a=rad 7,5,1,...
+            #print(permutation_matrix[i], pi_iter)
+            for j in range(len(docs_signature_sets[0])):#number of docs. Iterating through a doc.
+                for k in a[0]:
+                    #print("k",k,"j",j)
+                    if docs_signature_sets[k][j]==1:
+                        #print("sigrow",signature_row)
+                        if signature_row[j] ==0:
+                            signature_row[j]=pi_iter
+                            continue
                         #print("sigrow",signature_row)
 
             pi_iter+=1
@@ -329,6 +335,8 @@ def lsh(m_matrix):
 # METHOD FOR TASK 5
 # Calculates the similarities of the candidate documents
 def candidates_similarities(candidate_docs, min_hash_matrix):
+    #print("min_hash_matrix",min_hash_matrix)
+    #print("candidate docs",candidate_docs)
     """For the candidate document pairs from the previous task, calculate the document
 signature sets similarity using the fraction of the hash functions which they agree,
 i.e.
@@ -346,8 +354,9 @@ permutations"""
         #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         #print(min_hash_matrix)
 
-        for j in range(len(min_hash_matrix[0])):
-            if min_hash_matrix[nr1][j]==min_hash_matrix[nr2][j]:
+        print(nr1, nr2, len(min_hash_matrix), len(min_hash_matrix[0]))
+        for j in range(len(min_hash_matrix)):
+            if min_hash_matrix[j][nr1]==min_hash_matrix[j][nr2]:
                 similarity_matrix[i]+=1
         
     #print(similarity_matrix)
@@ -389,9 +398,6 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
 
-
-    # implement your code here
-
     return false_negatives, false_positives
 
 
@@ -405,6 +411,7 @@ if __name__ == '__main__':
     parameters_dictionary['naive']="true"
     parameters_dictionary["buckets"]=30
     parameters_dictionary['k']=5
+    parameters_dictionary["buckets"]=30
 
     # Reading the data
     print("Data reading...")
