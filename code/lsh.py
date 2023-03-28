@@ -175,6 +175,9 @@ def signature_set(k_shingles):
     print(f"Number of shingles {len(shingles)}")
 
     #print("docs_sig_sets",docs_sig_sets)
+    unique, counts = np.unique(docs_sig_sets, return_counts=True)
+
+    print(dict(zip(unique, counts)))
     return docs_sig_sets
 
     docs_sig_sets = []
@@ -218,21 +221,25 @@ def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
     #print("docs_signature_sets:",docs_signature_sets)
     permutation_matrix=[]
+    for i in docs_signature_sets:
+        print(i)
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
     tilfeldig=[]
-    for j in range(doc_size):           #shape[1]??
+    for j in range(1, doc_size+1):           #shape[1]??
         tilfeldig.append(j)
     for i in tqdm(range(pi)):
         random.shuffle(tilfeldig)
         permutation_matrix.append(tilfeldig.copy())
+    for i in permutation_matrix:
+        print(i)
     #print("permutation matrix:",permutation_matrix)
 
     min_hash_signatures = []
     
     for i in tqdm(range(pi)):
-        pi_iter=0
-        signature_row=np.empty(docs_signature_sets.shape[1]).tolist()
+        pi_iter=1
+        signature_row=np.zeros(docs_signature_sets.shape[1]).tolist()
         #for iter in range(len(docs_signature_sets)):
         while True:
             #print("sigrow of 0's",signature_row)#ok
@@ -242,13 +249,14 @@ def minHash(docs_signature_sets):
                     #print("sigrow",signature_row)
                     if signature_row[j] ==0:
                         signature_row[j]=pi_iter
+                        continue
                         #print("sigrow",signature_row)
 
             pi_iter+=1
             #print(signature_row)
             #print("docs_signature_sets",docs_signature_sets)
             #print("len",len(docs_signature_sets))
-            if ((0 not in signature_row) or (pi_iter>=doc_size)):
+            if ((0 not in signature_row) or (pi_iter>doc_size)):
                 #print("pi_iter",pi_iter)
                 min_hash_signatures.append(signature_row)
                 break
@@ -259,6 +267,8 @@ def minHash(docs_signature_sets):
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
+    for i in m_matrix:
+        print(i)
     no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
@@ -269,6 +279,7 @@ def lsh(m_matrix):
     start = 0
     end = start + r
     comparisons = 0
+    print("number of bands:", b)
     for band in tqdm(range(b)):
         buckets = []
         bucket_candidates = []
@@ -286,6 +297,7 @@ def lsh(m_matrix):
                     for index, bucket in enumerate(buckets):
                         if np.array_equal(temp, bucket):
                             bucket_candidates[index].append(column)
+                
                 #print(bucket_candidates)
             except:
                 pass
@@ -309,6 +321,7 @@ def lsh(m_matrix):
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
     print(f"number of comparisons = {comparisons}")
+    print(candidates)
     return candidates
 
 
@@ -388,8 +401,9 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
+    parameters_dictionary["buckets"]=30
     parameters_dictionary['k']=5
 
     # Reading the data
