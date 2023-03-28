@@ -9,7 +9,7 @@ import random
 from tqdm import tqdm
 import numpy as np
 import math
- 
+import re
 
 
 # Global parameters
@@ -102,7 +102,7 @@ def k_shingles_one_doc(document_file):
 
         for line in file:
             for word in line.split():
-                words.append(word)
+                words.append(re.sub('\W+','', word.lower()))               
     
         for i in range(len(words)):
             try:
@@ -316,6 +316,8 @@ def lsh(m_matrix):
 # METHOD FOR TASK 5
 # Calculates the similarities of the candidate documents
 def candidates_similarities(candidate_docs, min_hash_matrix):
+    #print("min_hash_matrix",min_hash_matrix)
+    #print("candidate docs",candidate_docs)
     """For the candidate document pairs from the previous task, calculate the document
 signature sets similarity using the fraction of the hash functions which they agree,
 i.e.
@@ -376,9 +378,6 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
 
-
-    # implement your code here
-
     return false_negatives, false_positives
 
 
@@ -388,9 +387,10 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
-    parameters_dictionary['naive']="true"
+    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
+    parameters_dictionary["buckets"]=30
 
     # Reading the data
     print("Data reading...")
