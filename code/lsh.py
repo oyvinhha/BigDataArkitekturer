@@ -131,12 +131,13 @@ def k_shingles():
 # METHOD FOR TASK 2
 # Creates a signatures set of the documents from the k-shingles list
 def signature_set(k_shingles):
-    docs_sig_sets = np.array([])
+    docs_sig_sets = []
     first_iter=True
 
     shingles = list(sorted(set(tuple(sub) for sub in sum(k_shingles, []))))
     print("Total amount of shingles: ",len(shingles))
     size = len(k_shingles)
+    k = parameters_dictionary["k"]
     #print(size)
     sorted_docs = []
     for doc in k_shingles:
@@ -146,11 +147,13 @@ def signature_set(k_shingles):
 
     for v in tqdm(shingles):
         temp_list = np.zeros(size)
-        temp_list2 = np.array([i[0] if len(i) == size else [""]*size for i in k_shingles])
+        temp_list2 = np.array([i[0] if len(i) > 0 else np.array([""]*k) for i in k_shingles],dtype=object)
         ind = np.where((temp_list2 == np.array(v)).all(axis=1))
         for i in ind[0]:
             k_shingles[i].pop(0)
         temp_list[ind] = 1
+        
+        docs_sig_sets.append(temp_list)
 
         """
         print(temp_list2)
@@ -163,12 +166,13 @@ def signature_set(k_shingles):
         #print(k_shingles)
         
         
+        print("t",temp_list)
         if first_iter:
             docs_sig_sets=np.array(list(temp_list))
             first_iter=False
         else:
-            docs_sig_sets=np.vstack([docs_sig_sets,list(temp_list)])
-    print(f"Number of shingles {len(shingles)}")"""
+            docs_sig_sets=np.vstack([docs_sig_sets,list(temp_list)])"""
+    print(f"Number of shingles {len(shingles)}")
 
     #print("docs_sig_sets",docs_sig_sets)
     return docs_sig_sets
@@ -384,7 +388,7 @@ if __name__ == '__main__':
     
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
     parameters_dictionary['k']=5
 
