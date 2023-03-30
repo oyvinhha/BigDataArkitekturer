@@ -104,9 +104,8 @@ def k_shingles_one_doc(document_file):
         for line in file:
             for word in line.lower().split():
                 s = ''.join(c for c in word if c.isalnum())
-                if s != "":
-                    words.append(s)   
-    
+                if s!="":
+                    words.append(s)
         for i in range(len(words)):
             try:
                 shingle=[]
@@ -215,6 +214,14 @@ def minHash(docs_signature_sets):
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
+    """
+    Divides the m_matrix into a number of bands and tries to put every column element in a band into
+    a defined number of buckets. If a bucket already contains the same column element then they are
+    a similar document candidate. This happens for every band, with a new set of buckets for each time.
+    Then it makes sure that all the candidates are pairs, and that there are no duplicate candidates.
+    Parameter is the 2d matrix calculated in the minHash function.
+    Returns a 2d list of all similar document candidates. 
+    """
     no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
@@ -228,31 +235,33 @@ def lsh(m_matrix):
         buckets = []
         bucket_candidates = []
         for column in range(m_matrix.shape[1]):
-            temp = []
+            temp = [] #Column element in a band.
             try:
                 for i in range(start, end):
                     temp.append(m_matrix[i][column])
+                #Checks if a column element is in a bucket, if not add to an empty bucket.
                 if not any(np.array_equal(x, temp) for x in buckets) and (len(buckets) < no_of_buckets):
                     buckets.append(temp)
                     bucket_candidates.append([column])
                 else:
+                    #Iterates all buckets to check where a column element is. 
                     for index, bucket in enumerate(buckets):
                         comparisons += 1
                         if np.array_equal(temp, bucket):
                             bucket_candidates[index].append(column)
             except:
                 pass
-        for candidate in bucket_candidates:
+        for candidate in bucket_candidates: 
             if len(candidate) > 1:
                 candidates.append(candidate)
         start = end
         end = start + r
-    for pair in candidates:
+    for pair in candidates: #Makes sure there are only candidate pairs. 
         if len(pair) > 2:
             for k in [(pair[i],pair[j]) for i in range(len(pair)) for j in range(i+1, len(pair))]:
                 candidates.append(k)
             candidates = [i for i in candidates if i != pair]
-    b_set = set(tuple(x) for x in candidates)
+    b_set = set(tuple(x) for x in candidates) #These two lines removes duplicates.
     candidates = [ list(x) for x in b_set ]
     print(f"number of comparisons = {comparisons}")
     return candidates
@@ -262,6 +271,14 @@ def lsh(m_matrix):
 # METHOD FOR TASK 5
 # Calculates the similarities of the candidate documents
 def candidates_similarities(candidate_docs, min_hash_matrix):
+    """
+    Calculates the similarity between all documents in a candidate_docs list. These calculations
+    are done by comparing their values in a min_hash_matrix. Formula is number of corresponding
+    same values over total number of values. 
+    Parameters are both 2d lists, candidate_docs with ids of candidates document pairs and
+    min_hash_matrix is the resulting list from the minhash function.
+    Returns a list of similarities in the same order as candidate_docs. 
+    """
 
     similarity_matrix=np.zeros(len(candidate_docs))
 
@@ -281,6 +298,11 @@ def candidates_similarities(candidate_docs, min_hash_matrix):
 # METHOD FOR TASK 6
 # Returns the document pairs of over t% similarity
 def return_results(lsh_similarity_matrix):
+    """
+    Counts how many of the similarities calculated are over a set threshold value.
+    Parameters are a list of similarity values, the indexes correspond to indexes of a candidate pair list.
+    Returns a 2d list of document pairs that have similarity over the threshold value.
+    """
     t=parameters_dictionary['t']
     document_pairs = []
     count = 0
@@ -295,17 +317,20 @@ def return_results(lsh_similarity_matrix):
 
 # METHOD FOR TASK 6
 def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
+    """
+    Calculates the number of false negatives and false positives based on similarity matrices.
+    Parameters are one similarity matrix from the lsh method and one from the naive method.
+    Returns two integers: number of false negatives and number of false positives.
+    """
     t = parameters_dictionary["t"]
     false_negatives = 0
     false_positives = 0
-
     for id, similarity in enumerate(lsh_similarity_matrix):
         naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
         if similarity > t and naive_sim <= t:
             false_positives += 1
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
-
 
     return false_negatives, false_positives
 
