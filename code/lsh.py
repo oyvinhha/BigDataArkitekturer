@@ -224,14 +224,15 @@ def minHash(docs_signature_sets):
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
     print(doc_size)
+    no_of_hashes = 50
     tilfeldig=[]
-    for j in range(1, (doc_size+1)//2):
+    for j in range(1, (doc_size+1)//no_of_hashes):
         tilfeldig.append(j)
-    tilfeldig = tilfeldig*2
-    print(tilfeldig)
+    tilfeldig = tilfeldig*no_of_hashes
+    
     if len(tilfeldig) < doc_size:
         for i in range(doc_size-len(tilfeldig)):
-            tilfeldig.append(random.randint(1, (doc_size+1)//2))
+            tilfeldig.append(random.randint(1, (doc_size+1)//no_of_hashes))
     for i in tqdm(range(pi)):
         random.shuffle(tilfeldig)      
         permutation_matrix.append(tilfeldig.copy())
@@ -327,7 +328,7 @@ def lsh(m_matrix):
     b_set = set(tuple(x) for x in candidates)
     candidates = [ list(x) for x in b_set ]
     print(f"number of comparisons = {comparisons}")
-    print(candidates)
+    #print(candidates)
     return candidates
 
 
@@ -354,13 +355,13 @@ permutations"""
         #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         #print(min_hash_matrix)
 
-        print(nr1, nr2, len(min_hash_matrix), len(min_hash_matrix[0]))
+        #print(nr1, nr2, len(min_hash_matrix), len(min_hash_matrix[0]))
         for j in range(len(min_hash_matrix)):
             if min_hash_matrix[j][nr1]==min_hash_matrix[j][nr2]:
                 similarity_matrix[i]+=1
         
     #print(similarity_matrix)
-    similarity_matrix/=len(min_hash_matrix[0])
+    similarity_matrix/=len(min_hash_matrix)
 
     print("sim_matrix:",similarity_matrix)
     # implement your code here
@@ -390,6 +391,10 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
     #print(naive_similarity_matrix[:10])
     false_negatives = 0
     false_positives = 0
+    total = 0
+    for i in naive_similarity_matrix:
+        if i > t:
+            total += 1
     for id, similarity in enumerate(lsh_similarity_matrix):
         naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
         #print(naive_sim)
@@ -397,6 +402,7 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
             false_positives += 1
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
+    print(total)
 
     return false_negatives, false_positives
 
@@ -404,14 +410,15 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
 # DO NOT CHANGE THIS METHOD
 # The main method where all code starts
 if __name__ == '__main__':
-    
     # Reading the parameters
     read_parameters()
-    parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
+    #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
     parameters_dictionary["buckets"]=30
-    parameters_dictionary['k']=5
+    parameters_dictionary['k']=1
     parameters_dictionary["buckets"]=30
+    parameters_dictionary["r"]=10
+    parameters_dictionary["permutations"]=50
 
     # Reading the data
     print("Data reading...")
