@@ -91,9 +91,11 @@ def naive():
     return similarity_matrix
 
 
-# METHOD FOR TASK 1
-# Creates the k-Shingles of each document and returns a list of them
+
 def k_shingles_one_doc(document_file):
+    """
+    Creates the k-shingles for a single document. Called by the k_shingles function. We chose to have shingles be words.
+    """
     k=parameters_dictionary["k"]
     with open(document_file,'r') as file:
         words=[]
@@ -115,7 +117,13 @@ def k_shingles_one_doc(document_file):
                 pass
     return docs_k_shingles
 
+# METHOD FOR TASK 1
 def k_shingles():
+    """
+    Creates k-shingles of each document, calling on the funciton k_shingles_one_doc().
+    Uses the global parameters_dictionary to access the data.
+    Returns a 3D list with k-shingles for each document
+    """
     directory="data/"+parameters_dictionary["data"]
     total=[]
     for filename in tqdm(os.listdir(directory)):
@@ -125,8 +133,13 @@ def k_shingles():
         
         
 # METHOD FOR TASK 2
-# Creates a signatures set of the documents from the k-shingles list
 def signature_set(k_shingles):
+    """
+    Creates a signatures set of the documents from the k-shingles list. 
+    Input is a 3D list k_shingles from task 1. 
+    Returns the signature set(shingles x documents) as a list of arrays where each array is a shingle and each column is a document. 
+    If the shingle is present in the document, the value at the index is 1, otherwise it is 0. 
+    """
     docs_sig_sets = []
     shingles = list(sorted(set(tuple(sub) for sub in sum(k_shingles, []))))
     size = len(k_shingles)
@@ -137,7 +150,7 @@ def signature_set(k_shingles):
         sorted_docs.append(sorted(doc))
     k_shingles = sorted_docs
 
-    for v in tqdm(shingles):
+    for v in tqdm(shingles):#Creating the rows of the signature set matrix, and adding them to the matrix at the end of the for loop. 
         temp_list = np.zeros(size)
         temp_list2 = np.array([i[0] if len(i) > 0 else np.array([""]*k) for i in k_shingles],dtype=object)
         ind = np.where((temp_list2 == np.array(v)).all(axis=1))
@@ -148,39 +161,43 @@ def signature_set(k_shingles):
         docs_sig_sets.append(temp_list)
 
     print(f"Number of shingles {len(shingles)}")
-
     return docs_sig_sets
 
 
 # METHOD FOR TASK 3
-# Creates the minHash signatures after simulation of permutations
 def minHash(docs_signature_sets):
+    """
+    Creates the minHash signatures after simulation of permutations.
+    Input is docs_signature_sets from task 2, a list of numpy arrays.
+    Returns the min-hash signatures. 
+    """
+    no_of_hashes = 50 #This is a value that we are setting. 
     pi=parameters_dictionary['permutations']
-    permutation_matrix=[]
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
-    no_of_hashes = 50 #This is a value that we are setting. 
+    permutation_matrix=[]
     tilfeldig=[]
 
-    for j in range(1, (doc_size+1)//no_of_hashes):
+    for j in range(1, (doc_size+1)//no_of_hashes):#tilfeldig becomes [1,2,...,no_of_hashes]*no_of_hashes.
         tilfeldig.append(j)
     tilfeldig = tilfeldig*no_of_hashes
     
-    if len(tilfeldig) < doc_size:
+    if len(tilfeldig) < doc_size:#handling cases where doc_size is not divisible by no_of_hashes, adding random values between 1 and (doc_size+1)//no_of_hashes.
         for i in range(doc_size-len(tilfeldig)):
             tilfeldig.append(random.randint(1, (doc_size+1)//no_of_hashes))
-    for i in tqdm(range(pi)):
-        random.shuffle(tilfeldig)      
+
+    for i in tqdm(range(pi)):#Finally, shuffles tilfeldig and adding it to permutation_matrix, pi number of times.
+        random.shuffle(tilfeldig)
         permutation_matrix.append(tilfeldig.copy())
 
     min_hash_signatures = []
     
-    for i in tqdm(range(pi)):
+    for i in tqdm(range(pi)):#Creating the signature matrix from the permutation matrix.
         pi_iter=1
         signature_row=np.zeros(docs_signature_sets.shape[1]).tolist()
         while True:
             a=np.where(np.array(permutation_matrix[i]) == pi_iter)
-            for j in range(len(docs_signature_sets[0])):#number of docs. Iterating through a doc.
+            for j in range(len(docs_signature_sets[0])):#Number of docs. Iterating through a doc.
                 for k in a[0]:
                     if docs_signature_sets[k][j]==1:
                         if signature_row[j] ==0:
@@ -280,17 +297,14 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
     t = parameters_dictionary["t"]
     false_negatives = 0
     false_positives = 0
-    total = 0
-    for i in naive_similarity_matrix:
-        if i > t:
-            total += 1
+
     for id, similarity in enumerate(lsh_similarity_matrix):
         naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
         if similarity > t and naive_sim <= t:
             false_positives += 1
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
-    print(total)
+
 
     return false_negatives, false_positives
 
@@ -303,6 +317,7 @@ if __name__ == '__main__':
 
     #Here, one can change the parameters.
     parameters_dictionary['naive']="true"
+    parameters_dictionary["data"]="test"
 
     # Reading the data
     print("Data reading...")
