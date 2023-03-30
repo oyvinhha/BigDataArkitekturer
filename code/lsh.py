@@ -91,7 +91,7 @@ def naive():
     return similarity_matrix
 
 
-
+#METHOD FOR TASK 1
 def k_shingles_one_doc(document_file):
     """
     Creates the k-shingles for a single document. Called by the k_shingles function. We chose to have shingles be words.
@@ -176,6 +176,7 @@ def minHash(docs_signature_sets):
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
     no_of_hashes = 50 #This is a value that we are setting. 
+    permutation_matrix=[]
     tilfeldig=[]
 
     for j in range(1, (doc_size+1)//no_of_hashes):#tilfeldig becomes [1,2,...,no_of_hashes]*no_of_hashes.
