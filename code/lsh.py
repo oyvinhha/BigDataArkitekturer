@@ -104,8 +104,14 @@ def k_shingles_one_doc(document_file):
         for line in file:
             for word in line.lower().split():
                 s = ''.join(c for c in word if c.isalnum())
+<<<<<<< HEAD
+                if s != "":
+                    words.append(s)   
+    
+=======
                 if s!="":
                     words.append(s)
+>>>>>>> e72391bfd494a0751447806bfaa4b95cf67aebe8
         for i in range(len(words)):
             try:
                 shingle=[]
@@ -175,7 +181,12 @@ def minHash(docs_signature_sets):
     pi=parameters_dictionary['permutations']
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
-    permutation_matrix=[]
+<<<<<<< HEAD
+    print(doc_size)
+    no_of_hashes = 100
+=======
+    no_of_hashes = 50 #This is a value that we are setting. 
+>>>>>>> e72391bfd494a0751447806bfaa4b95cf67aebe8
     tilfeldig=[]
 
     for j in range(1, (doc_size+1)//no_of_hashes):#tilfeldig becomes [1,2,...,no_of_hashes]*no_of_hashes.
@@ -214,6 +225,11 @@ def minHash(docs_signature_sets):
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
+<<<<<<< HEAD
+    #for i in m_matrix:
+    #    print(i)
+=======
+>>>>>>> e72391bfd494a0751447806bfaa4b95cf67aebe8
     no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
@@ -300,7 +316,11 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
 
     for id, similarity in enumerate(lsh_similarity_matrix):
         naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
+<<<<<<< HEAD
+        if similarity >= t and naive_sim < t:
+=======
         if similarity > t and naive_sim <= t:
+>>>>>>> e72391bfd494a0751447806bfaa4b95cf67aebe8
             false_positives += 1
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
@@ -317,7 +337,14 @@ if __name__ == '__main__':
 
     #Here, one can change the parameters.
     parameters_dictionary['naive']="true"
-    parameters_dictionary["data"]="test"
+<<<<<<< HEAD
+    parameters_dictionary["buckets"]=30
+    parameters_dictionary['k']=5
+    #parameters_dictionary["buckets"]=400
+    #parameters_dictionary["r"]=5
+    #parameters_dictionary["permutations"]=60
+=======
+>>>>>>> e72391bfd494a0751447806bfaa4b95cf67aebe8
 
     # Reading the data
     print("Data reading...")
