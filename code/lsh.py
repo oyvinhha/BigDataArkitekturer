@@ -414,11 +414,11 @@ if __name__ == '__main__':
     read_parameters()
     #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
-    parameters_dictionary["buckets"]=30
-    parameters_dictionary['k']=1
-    parameters_dictionary["buckets"]=30
-    parameters_dictionary["r"]=10
-    parameters_dictionary["permutations"]=50
+    #parameters_dictionary["buckets"]=30
+    parameters_dictionary['k']=10
+    #parameters_dictionary["buckets"]=30
+    #parameters_dictionary["r"]=10
+    #parameters_dictionary["permutations"]=50
 
     # Reading the data
     print("Data reading...")
