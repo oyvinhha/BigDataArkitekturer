@@ -405,6 +405,7 @@ if __name__ == '__main__':
     pairs = return_results(lsh_similarity_matrix)
     t15 = time.time()
     print("The pairs of documents are:\n")
+    print(pairs)
 
     # Count false negatives and positives
     if parameters_dictionary['naive']:
