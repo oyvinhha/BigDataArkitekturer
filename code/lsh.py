@@ -101,8 +101,10 @@ def k_shingles_one_doc(document_file):
         docs_k_shingles=[]# holds the k-shingles of each document
 
         for line in file:
-            for word in line.split():
-                words.append(re.sub('\W+','', word.lower()))               
+            for word in line.lower().split():
+                s = ''.join(c for c in word if c.isalnum())
+                if s != "":
+                    words.append(s)   
     
         for i in range(len(words)):
             try:
@@ -224,7 +226,7 @@ def minHash(docs_signature_sets):
     docs_signature_sets = np.array(docs_signature_sets)
     doc_size = docs_signature_sets.shape[0]
     print(doc_size)
-    no_of_hashes = 50
+    no_of_hashes = 100
     tilfeldig=[]
     for j in range(1, (doc_size+1)//no_of_hashes):
         tilfeldig.append(j)
@@ -274,8 +276,8 @@ def minHash(docs_signature_sets):
 # METHOD FOR TASK 4
 # Hashes the MinHash Signature Matrix into buckets and find candidate similar documents
 def lsh(m_matrix):
-    for i in m_matrix:
-        print(i)
+    #for i in m_matrix:
+    #    print(i)
     no_of_buckets=parameters_dictionary["buckets"]
     r=parameters_dictionary["r"]
     candidates = []  # list of candidate sets of documents for checking similarity
@@ -294,7 +296,6 @@ def lsh(m_matrix):
             temp = []
             try:
                 for i in range(start, end):
-                    comparisons += 1
                     temp.append(m_matrix[i][column])
                 #print(temp)
                 if not any(np.array_equal(x, temp) for x in buckets) and (len(buckets) < no_of_buckets):
@@ -302,6 +303,7 @@ def lsh(m_matrix):
                     bucket_candidates.append([column])
                 else:
                     for index, bucket in enumerate(buckets):
+                        comparisons += 1
                         if np.array_equal(temp, bucket):
                             bucket_candidates[index].append(column)
                 
@@ -397,8 +399,7 @@ def count_false_neg_and_pos(lsh_similarity_matrix, naive_similarity_matrix):
             total += 1
     for id, similarity in enumerate(lsh_similarity_matrix):
         naive_sim = naive_similarity_matrix[get_triangle_index(candidate_docs[id][0], candidate_docs[id][1], len(document_list))]
-        #print(naive_sim)
-        if similarity > t and naive_sim <= t:
+        if similarity >= t and naive_sim < t:
             false_positives += 1
         elif similarity <= t and naive_sim > t:
             false_negatives += 1
@@ -414,11 +415,11 @@ if __name__ == '__main__':
     read_parameters()
     #parameters_dictionary['data']="test"                            #GOING THROUGH THE TEST DATA
     parameters_dictionary['naive']="true"
-    #parameters_dictionary["buckets"]=30
-    parameters_dictionary['k']=10
-    #parameters_dictionary["buckets"]=30
-    #parameters_dictionary["r"]=10
-    #parameters_dictionary["permutations"]=50
+    parameters_dictionary["buckets"]=30
+    parameters_dictionary['k']=5
+    #parameters_dictionary["buckets"]=400
+    #parameters_dictionary["r"]=5
+    #parameters_dictionary["permutations"]=60
 
     # Reading the data
     print("Data reading...")
