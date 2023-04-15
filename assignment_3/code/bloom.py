@@ -3,6 +3,8 @@
 import configparser  # for reading the parameters file
 from pathlib import Path  # for paths of files
 import time  # for timing
+import math
+import random
 import numpy as np
 
 # Global parameters
@@ -29,11 +31,12 @@ def bloom_filter(new_pass):
 
     # implement your code here
     if initialization:
-        index = hash_functions(new_pass)
+        index = hash_functions(new_pass, h_primes, parameters_dictionary['n'])
         bloom[index] = 1
         return 0
     else:
-        for i in hash_functions(new_pass):
+        
+        for i in hash_functions(new_pass, h_primes, parameters_dictionary['n']):
             if bloom[i] == 0:
                 return 0
         return 1
@@ -69,23 +72,50 @@ def read_data(file):
 
     return pass_read, time_sum
 
+def get_h_prime_numbers(start,end,h):
+    primes=[]
+    for i in range(start,end):
+        prime=True
+        for j in range(2,math.ceil(i/2)+1):
+            if i%j==0:
+                prime=False
+        if prime:
+            primes.append(i)
+        prime
+
+    return random.sample(primes, h)
+
 
 # TASK 1
 # Created h number of hash functions
-def hash_functions():
+def hash_function(s:str,p:int,n:int):
+    
+    s = [ord(c) for c in s]
+    the_sum=0
+    for count,ascii_of_letter in enumerate(s):
+        the_sum+=ascii_of_letter*p**count
+    answer=the_sum%n
+    return answer
 
-    # implement your code here
 
-    return 0
-
+def hash_functions(s:str,primes:list[int],n:int):
+    return_list=[]
+    for prime in primes:
+        return_list.append(hash_function(s,prime,n))
+    return return_list
+        
 
 if __name__ == '__main__':
     # Reading the parameters
     read_parameters()
     bloom = np.zeros(parameters_dictionary['n'])
+    parameters_dictionary['data'] = "test"
 
     # Creating the hash functions
-    hash_functions()
+    h_primes=get_h_prime_numbers(2,100,parameters_dictionary['h'])
+
+    hashet=hash_functions("asdf",h_primes,parameters_dictionary['n'])
+    print(hashet)
 
     # Reading the data
     print("Stream reading...")
@@ -95,6 +125,7 @@ if __name__ == '__main__':
     print(passwords_read, "passwords were read and processed in average", times_sum / passwords_read,
           "sec per password\n")
 
+    print(sum(bloom))
     initialization = False
     false_positives, times_sum = count_false_positives()
     print(f"Number of false positives: {false_positives}")
