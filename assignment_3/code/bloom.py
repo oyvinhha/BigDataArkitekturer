@@ -6,6 +6,7 @@ import time  # for timing
 import math
 import random
 import numpy as np
+from tqdm import tqdm
 
 # Global parameters
 parameter_file = 'default_parameters.ini'  # the main parameters file
@@ -28,8 +29,6 @@ def read_parameters():
 
 # TASK 2
 def bloom_filter(new_pass):
-
-    # implement your code here
     if initialization:
         index = hash_functions(new_pass, h_primes, parameters_dictionary['n'])
         bloom[index] = 1
@@ -62,9 +61,9 @@ def read_data(file):
     time_sum = 0
     pass_read = 0
     with file.open(encoding="UTF-8") as f:
-        for line in f:
+        for line in tqdm(f):
             pass_read += 1
-            new_password = line[:-3]
+            new_password = line[:-2]
             ts = time.time()
             bloom_filter(new_password)
             te = time.time()
@@ -108,19 +107,19 @@ def hash_functions(s:str,primes:list[int],n:int):
 if __name__ == '__main__':
     # Reading the parameters
     read_parameters()
+    
+    #If we want to change parameters, we can do so here.
     bloom = np.zeros(parameters_dictionary['n'])
-    parameters_dictionary['data'] = "test"
+    
 
     # Creating the hash functions
-    h_primes=get_h_prime_numbers(2,100,parameters_dictionary['h'])
-
-    hashet=hash_functions("asdf",h_primes,parameters_dictionary['n'])
-    print(hashet)
+    h_primes=get_h_prime_numbers(2,10000,parameters_dictionary['h'])
 
     # Reading the data
     print("Stream reading...")
     initialization = True
     data_file = (data_main_directory / parameters_dictionary['data']).with_suffix('.csv')
+
     passwords_read, times_sum = read_data(data_file)
     print(passwords_read, "passwords were read and processed in average", times_sum / passwords_read,
           "sec per password\n")
